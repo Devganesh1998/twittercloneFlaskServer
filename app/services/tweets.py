@@ -34,19 +34,17 @@ def addNewTweet(data):
 
 def getAllTweet(data):
     try:
-        followerData = User.query.filter(User.email == data['email']).first()
-        sqlQuery = "SELECT * from tweets WHERE tweets.userId = (SELECT parentId from followers WHERE follower = :followerId)"
-        arg = ({"followerId":followerData.id})
-        result = db.session.execute(sqlQuery,arg)
-        print(result)
         if data is None:
-            return ({'error': True, 'errormsg': "Given payload is empty", 'isTweetFetched': False, 'sampleFormat': {'title': 'test', 'description': 'this is a test description', 'email': 'testmail'}})
-        print(data)
+            return ({'error': True, 'errormsg': "Given payload is empty", 'isTweetFetched': False, 'sampleFormat': {'page': 1, 'email': 'testmail'}})
         page = 1
         if data['page'] is not None:
             page = data['page']
-        off = 10 * (int(page) - 1)
-        tweets = Tweet.query.join(User).order_by(desc(Tweet.createdAt)).offset(off).limit(20).all()
+        off = 20 * (int(page) - 1)
+
+        followerData = User.query.filter(User.email == data['email']).first()
+        sqlQuery = "SELECT * from tweets WHERE tweets.userId = ANY (SELECT parentId from followers WHERE follower = :followerId) ORDER BY tweets.createdAt LIMIT :offset, 20"
+        arg = ({"followerId":followerData.id, 'offset': off})
+        tweets = db.session.execute(sqlQuery,arg)
         print(tweets)
         temp = []
         for b in tweets:
@@ -54,4 +52,4 @@ def getAllTweet(data):
         return ({'error': False, 'isTweetFetched': True, 'tweets': temp})
     except Exception as err:
         print(err)
-        return ({'error': True, 'errormsg': str(err), 'isTweetFetched': False, 'sampleFormat': {'title': 'test', 'description': 'this is a test description', 'email': 'testmail'}})
+        return ({'error': True, 'errormsg': str(err), 'isTweetFetched': False, 'sampleFormat': {'page': 1, 'email': 'testmail'}})
