@@ -48,7 +48,7 @@ def getAllTweet(data):
         print(tweets)
         temp = []
         for b in tweets:
-            temp.append({"id": b.id, "title": b.title, "description": b.description, "userId": b.userId})
+            temp.append({"id": b.id, "title": b.title, "likes": b.likes, "createdAt": str(b.createdAt), "description": b.description, "userId": b.userId})
         return ({'error': False, 'isTweetFetched': True, 'tweets': temp})
     except Exception as err:
         print(err)

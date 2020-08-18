@@ -84,9 +84,11 @@ def login_user(credentials):
 def logout_user():
     try:
         signedEmail = request.cookies.get('signedEmail')
-        redisIns.DEL(signedEmail)
-        resp.set_cookie('auth_token', '', max_age=0)
-        return({'isLogoutSuccess': True})
+        # redisIns.DEL(signedEmail)
+        resp = make_response({'isLogoutSuccess': True})
+        resp.set_cookie('signedEmail', '', max_age=0)
+        print(resp)
+        return resp
     except Exception as err:
         return({'isLogoutSuccess': False, 'errormsg': str(err)})
 

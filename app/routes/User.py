@@ -1,12 +1,18 @@
 from . import user
 from flask import request
 from ..services.auth import register_user, login_user, logout_user, verifyAuth
+from ..services.Users import getAllUsers
 import json
 
 
-@user.route('/')
+@user.route('/', methods=['GET'])
 def users_home():
-    return 'user home'
+    return 'user Home'
+
+@user.route('/getAllUsers', methods=['GET'])
+def fetchUsers():
+    res = getAllUsers()
+    return json.dumps(res)
 
 
 @user.route('/login', methods=['POST'])
@@ -26,7 +32,7 @@ def signup():
 @user.route('/logout', methods=['GET'])
 def logout():
     res = logout_user()
-    return json.dumps(res)
+    return res
 
 
 @user.route('/verifyAuth', methods=['GET'])
