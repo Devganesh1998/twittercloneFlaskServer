@@ -3,7 +3,7 @@ from flask_cors import CORS
 
 config_name = 'development'
 app = create_app(config_name)
-CORS(app)
+CORS(app, supports_credentials=True)
 
 @app.route('/')
 def home():
