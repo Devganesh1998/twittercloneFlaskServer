@@ -34,9 +34,11 @@ def addNewTweet(data):
 
 def getAllTweet(data):
     try:
-        # sqlQuery = "SELECT * from tweets JOIN users ON users.id = tweets.userId (SELECT parentId from followers WHERE follower = :followerId)"
-        # arg = ({"followerId":data['followerId']})
-        # result = db.session.execute(sqlQuery,arg)
+        followerData = User.query.filter(User.email == data['email']).first()
+        sqlQuery = "SELECT * from tweets WHERE tweets.userId = (SELECT parentId from followers WHERE follower = :followerId)"
+        arg = ({"followerId":followerData.id})
+        result = db.session.execute(sqlQuery,arg)
+        print(result)
         if data is None:
             return ({'error': True, 'errormsg': "Given payload is empty", 'isTweetFetched': False, 'sampleFormat': {'title': 'test', 'description': 'this is a test description', 'email': 'testmail'}})
         print(data)

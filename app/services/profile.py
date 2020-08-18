@@ -1,5 +1,7 @@
 from ..models import db
 import json
+from ..models.followers import Follower
+from ..models.user import User
 import datetime
 from sqlalchemy import desc
 
@@ -34,3 +36,32 @@ def getProfile(userEmail):
     except Exception as err:
         print(err)
         return ({'error': True, 'errormsg': str(err), 'isProfileFetched': False})
+
+def followUser(data):
+    try:
+        if data is None:
+            return ({'error': True, 'errormsg': "Given payload is empty", 'isProfileFollowed': False, 'sampleFormat': {'email': 'testmail', 'parentId': 2}})
+        result = User.query.filter(User.email == data['email']).first()
+        tempUser = Follower(
+            parentId=data['parentId'],
+            follower=result.id,
+        )
+        db.session.add(tempUser)
+        db.session.commit()
+        return ({'error': False, 'isProfileFollowed': True})
+    except Exception as err:
+        print(err)
+        return ({'error': True, 'errormsg': str(err), 'isProfileFollowed': False, 'sampleFormat': {'email': 'testmail', 'parentId': 2}})
+
+def unfollowUser(data):
+    try:
+        if data is None:
+            return ({'error': True, 'errormsg': "Given payload is empty", 'isProfileUnfollowed': False, 'sampleFormat': {'email': 'testmail', 'parentId': 2}})
+        result = User.query.filter(User.email == data['email']).first()
+        print('data', data)
+        Follower.query.filter(Follower.parentId == data['parentId']).filter(Follower.follower == result.id).delete()
+        db.session.commit()
+        return ({'error': False, 'isProfileUnfollowed': True})
+    except Exception as err:
+        print(err)
+        return ({'error': True, 'errormsg': str(err), 'isProfileUnfollowed': False, 'sampleFormat': {'email': 'testmail', 'parentId': 2}})

@@ -84,7 +84,7 @@ def login_user(credentials):
 def logout_user():
     try:
         signedEmail = request.cookies.get('signedEmail')
-        # redisIns.DEL(signedEmail)
+        redisIns.DEL(signedEmail)
         resp = make_response({'isLogoutSuccess': True})
         resp.set_cookie('signedEmail', '', max_age=0)
         print(resp)
@@ -96,7 +96,12 @@ def logout_user():
 def verifyAuth():
     try:
         signedEmail = request.cookies.get('signedEmail')
+        signedEmailPayload = jwt.decode(signedEmail, authKey)
         if (redisIns.get(signedEmail)):
-            return({'isAuthenticated': True})
+            auth_token = redisIns.get(signedEmail)
+            payload = jwt.decode(auth_token, authKey)
+            if payload['email'] == signedEmailPayload['email']:
+                return({'isAuthenticated': True})
+        return({'isAuthenticated': False, 'errormsg': "Session Expired"})
     except Exception as err:
         return({'isAuthenticated': False, 'errormsg': str(err)})
