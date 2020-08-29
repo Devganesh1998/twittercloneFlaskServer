@@ -1,7 +1,7 @@
 from . import user
 from flask import request
 from ..services.auth import register_user, login_user, logout_user, verifyAuth
-from ..services.Users import getAllUsers
+from ..services.Users import getAllUsers, getUsersToExplore
 import json
 
 
@@ -12,6 +12,11 @@ def users_home():
 @user.route('/getAllUsers', methods=['GET'])
 def fetchUsers():
     res = getAllUsers()
+    return json.dumps(res)
+
+@user.route('/getUsersToExplore', methods=['GET'])
+def fetchUsersToExplore():
+    res = getUsersToExplore()
     return json.dumps(res)
 
 

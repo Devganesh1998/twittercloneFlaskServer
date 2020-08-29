@@ -42,7 +42,7 @@ def getAllTweet(data):
         off = 20 * (int(page) - 1)
 
         followerData = User.query.filter(User.email == data['email']).first()
-        sqlQuery = "SELECT * from tweets WHERE tweets.userId = ANY (SELECT parentId from followers WHERE follower = :followerId) ORDER BY tweets.createdAt LIMIT :offset, 20"
+        sqlQuery = "SELECT * from tweets WHERE tweets.userId = ANY (SELECT parentId from followers WHERE follower = :followerId) OR tweets.userId = :followerId ORDER BY tweets.createdAt DESC LIMIT :offset, 20"
         arg = ({"followerId":followerData.id, 'offset': off})
         tweets = db.session.execute(sqlQuery,arg)
         print(tweets)
@@ -53,3 +53,16 @@ def getAllTweet(data):
     except Exception as err:
         print(err)
         return ({'error': True, 'errormsg': str(err), 'isTweetFetched': False, 'sampleFormat': {'page': 1, 'email': 'testmail'}})
+
+
+# SELECT id, name, location, userTag, age, email, password, mobile, tweetCount, followingCount, followersCount, joined, dob AS "Date of birth", description, profileImgUrl, posterImgUrl from users WHERE users.email != "ashwin12";
+
+
+
+# SELECT id, name, location, userTag, CASE WHEN (SELECT) AS isFollowing, age, email, password, mobile, tweetCount, followingCount, followersCount, joined, dob AS "Date of birth", description, profileImgUrl, posterImgUrl from users WHERE users.email != "ashwin12";
+
+# SELECT id, name, location, userTag, CASE WHEN (SELECT id from followers where parentId = users.id AND follower = 3) > 0 THEN true ELSE false END AS isFollowing, age, email, password, mobile, tweetCount, followingCount, followersCount, joined, dob AS "Date of birth", description, profileImgUrl, posterImgUrl from users WHERE users.email != "ashwin12";
+
+# SELECT id, name, location, userTag, CASE WHEN 2 = ANY (SELECT follower from followers where parentId = users.id) THEN true ELSE false END AS isFollowing, age, email, password, mobile, tweetCount, followingCount, followersCount, joined, dob AS "Date of birth", description, profileImgUrl, posterImgUrl from users WHERE users.email != "ashwin12";
+
+# SELECT id, name, location, userTag, CASE WHEN (SELECT id FROM users WHERE email = "testmail") = ANY (SELECT follower from followers where parentId = users.id) THEN true ELSE false END AS isFollowing, age, email, password, mobile, tweetCount, followingCount, followersCount, joined, dob AS "Date of birth", description, profileImgUrl, posterImgUrl from users WHERE users.email != "testmail";
