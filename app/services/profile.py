@@ -48,6 +48,14 @@ def followUser(data):
         )
         db.session.add(tempUser)
         db.session.commit()
+        
+        userdata = User.query.filter(User.id == result.id).first()    
+        userdata.followingCount=userdata.followingCount + 1,
+        db.session.commit()
+        
+        userdata = User.query.filter(User.id == data['parentId']).first()    
+        userdata.followersCount=userdata.followersCount + 1,
+        db.session.commit()
         return ({'error': False, 'isProfileFollowed': True})
     except Exception as err:
         print(err)
@@ -60,6 +68,14 @@ def unfollowUser(data):
         result = User.query.filter(User.email == data['email']).first()
         print('data', data)
         Follower.query.filter(Follower.parentId == data['parentId']).filter(Follower.follower == result.id).delete()
+        db.session.commit()
+        
+        userdata = User.query.filter(User.id == result.id).first()    
+        userdata.followingCount=userdata.followingCount - 1,
+        db.session.commit()
+        
+        userdata = User.query.filter(User.id == data['parentId']).first()    
+        userdata.followersCount=userdata.followersCount - 1,
         db.session.commit()
         return ({'error': False, 'isProfileUnfollowed': True})
     except Exception as err:

@@ -5,6 +5,7 @@ import json
 import datetime
 from sqlalchemy import desc
 
+
 def addNewTweet(data):
     try:
         if data is None:
@@ -21,11 +22,11 @@ def addNewTweet(data):
         )
         db.session.add(temptweet)
         db.session.commit()
-        
-        userdata = User.query.filter(User.id == result.id).first()    
-        userdata.tweetCount=userdata.tweetCount + 1,
+
+        userdata = User.query.filter(User.id == result.id).first()
+        userdata.tweetCount = userdata.tweetCount + 1,
         db.session.commit()
-        
+
         return ({'error': False, 'isTweetAdded': True, 'message': 'Tweet Added Successfully'})
     except Exception as err:
         print(err)
@@ -43,20 +44,40 @@ def getAllTweet(data):
 
         followerData = User.query.filter(User.email == data['email']).first()
         sqlQuery = "SELECT * from tweets WHERE tweets.userId = ANY (SELECT parentId from followers WHERE follower = :followerId) OR tweets.userId = :followerId ORDER BY tweets.createdAt DESC LIMIT :offset, 20"
-        arg = ({"followerId":followerData.id, 'offset': off})
-        tweets = db.session.execute(sqlQuery,arg)
+        arg = ({"followerId": followerData.id, 'offset': off})
+        tweets = db.session.execute(sqlQuery, arg)
         print(tweets)
         temp = []
         for b in tweets:
-            temp.append({"id": b.id, "title": b.title, "likes": b.likes, "createdAt": str(b.createdAt), "description": b.description, "userId": b.userId})
+            temp.append({"id": b.id, "title": b.title, "likes": b.likes, "createdAt": str(
+                b.createdAt), "description": b.description, "userId": b.userId})
         return ({'error': False, 'isTweetFetched': True, 'tweets': temp})
     except Exception as err:
         print(err)
         return ({'error': True, 'errormsg': str(err), 'isTweetFetched': False, 'sampleFormat': {'page': 1, 'email': 'testmail'}})
 
 
-# SELECT id, name, location, userTag, age, email, password, mobile, tweetCount, followingCount, followersCount, joined, dob AS "Date of birth", description, profileImgUrl, posterImgUrl from users WHERE users.email != "ashwin12";
+def likeATweet(data):
+    try:
+        if data is None or data['tweetId'] is None or data['likedUserMail'] is None:
+            return ({'error': True, 'errormsg': "Given payload didn't met the requirements", 'isTweetLiked': False, 'sampleFormat': {'tweetId': 1, 'likedUserMail': 'testmail@mail.com'}})
 
+        sqlQuery = "INSERT INTO likes (tweetId, likedUserId) VALUES (:tweetId, (SELECT id from users WHERE email = :likedUserMail));"
+        arg = ({"tweetId": data["tweetId"],
+                'likedUserMail': data['likedUserMail']})
+        db.session.execute(sqlQuery, arg)
+        
+        tweetData = Tweet.query.filter(Tweet.id == data["tweetId"]).first()
+        tweetData.likes = tweetData.likes + 1,
+        db.session.commit()
+
+        return ({'error': False, 'isTweetLiked': True})
+    except Exception as err:
+        print(err)
+        return ({'error': True, 'errormsg': str(err), 'isTweetLiked': False, 'sampleFormat': {'tweetId': 1, 'likedUserMail': 'testmail@mail.com'}})
+
+
+# SELECT id, name, location, userTag, age, email, password, mobile, tweetCount, followingCount, followersCount, joined, dob AS "Date of birth", description, profileImgUrl, posterImgUrl from users WHERE users.email != "ashwin12";
 
 
 # SELECT id, name, location, userTag, CASE WHEN (SELECT) AS isFollowing, age, email, password, mobile, tweetCount, followingCount, followersCount, joined, dob AS "Date of birth", description, profileImgUrl, posterImgUrl from users WHERE users.email != "ashwin12";

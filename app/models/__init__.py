@@ -3,4 +3,4 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-from . import user, followers, tweets
+from . import user, followers, tweets, likes
