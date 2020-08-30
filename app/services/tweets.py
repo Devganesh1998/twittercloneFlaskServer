@@ -70,8 +70,8 @@ def likeATweet(data):
         tweetData = Tweet.query.filter(Tweet.id == data["tweetId"]).first()
         tweetData.likes = tweetData.likes + 1,
         db.session.commit()
-
-        return ({'error': False, 'isTweetLiked': True})
+        
+        return ({'error': False, 'isTweetLiked': True, "likes": tweetData.likes, "id": tweetData.id})
     except Exception as err:
         print(err)
         return ({'error': True, 'errormsg': str(err), 'isTweetLiked': False, 'sampleFormat': {'tweetId': 1, 'likedUserMail': 'testmail@mail.com'}})

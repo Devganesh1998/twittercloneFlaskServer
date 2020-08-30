@@ -53,10 +53,11 @@ def followUser(data):
         userdata.followingCount=userdata.followingCount + 1,
         db.session.commit()
         
-        userdata = User.query.filter(User.id == data['parentId']).first()    
-        userdata.followersCount=userdata.followersCount + 1,
+        parentUserData = User.query.filter(User.id == data['parentId']).first()    
+        parentUserData.followersCount=parentUserData.followersCount + 1,
         db.session.commit()
-        return ({'error': False, 'isProfileFollowed': True})
+        return ({'error': False, 'isProfileFollowed': True, 'updatedProfile': {'id': parentUserData.id, 'name': parentUserData.name, 'location': parentUserData.location, 'userTag': parentUserData.userTag, 'age': parentUserData.age, 'email': parentUserData.email, 'password': parentUserData.password, 'mobile': parentUserData.mobile, 
+                    'tweetCount': parentUserData.tweetCount, 'followingCount': parentUserData.followingCount, 'followersCount': parentUserData.followersCount, 'joined': str(parentUserData.joined), 'isFollowing': 1, 'dob': str(parentUserData.dob), 'description': parentUserData.description, 'profileImgUrl': parentUserData.profileImgUrl, 'posterImgUrl': parentUserData.posterImgUrl}})
     except Exception as err:
         print(err)
         return ({'error': True, 'errormsg': str(err), 'isProfileFollowed': False, 'sampleFormat': {'email': 'testmail', 'parentId': 2}})
@@ -74,8 +75,8 @@ def unfollowUser(data):
         userdata.followingCount=userdata.followingCount - 1,
         db.session.commit()
         
-        userdata = User.query.filter(User.id == data['parentId']).first()    
-        userdata.followersCount=userdata.followersCount - 1,
+        parentUserData = User.query.filter(User.id == data['parentId']).first()    
+        parentUserData.followersCount=parentUserData.followersCount - 1,
         db.session.commit()
         return ({'error': False, 'isProfileUnfollowed': True})
     except Exception as err:
