@@ -9,13 +9,13 @@ def getUserTweets(userEmail):
     try:
         if userEmail is None:
             return ({'error': True, 'errormsg': "Given payload is empty", 'isTweetFetched': False})
-        sqlQuery = "SELECT * from tweets JOIN users ON users.id = tweets.userId WHERE users.email = :userEmail"
+        sqlQuery = "SELECT t.id, t.title, t.description, u.userTag, u.email, t.userId, t.likes, u.profileImgUrl, u.followingCount, u.followersCount, t.createdAt from tweets AS t JOIN users AS u ON u.id = t.userId WHERE u.email = :userEmail"
         arg = ({"userEmail":userEmail})
         result = db.session.execute(sqlQuery,arg)
         print(result)
         temp = []
         for b in result:
-            temp.append({"title": b.title, "description": b.description, 'userTag': b.userTag,'email': b.email, "userId": b.userId, 'likes': b.likes, 'profileImgUrl': b.profileImgUrl, 'followingCount': b.followingCount, 'followersCount': b.followersCount, 'createdAt': str(b.createdAt)})
+            temp.append({'id': b.id, "title": b.title, "description": b.description, 'userTag': b.userTag,'email': b.email, "userId": b.userId, 'likes': b.likes, 'profileImgUrl': b.profileImgUrl, 'followingCount': b.followingCount, 'followersCount': b.followersCount, 'createdAt': str(b.createdAt)})
         return ({'error': False, 'isTweetFetched': True, 'tweets': temp})
     except Exception as err:
         print(err)
@@ -78,7 +78,8 @@ def unfollowUser(data):
         parentUserData = User.query.filter(User.id == data['parentId']).first()    
         parentUserData.followersCount=parentUserData.followersCount - 1,
         db.session.commit()
-        return ({'error': False, 'isProfileUnfollowed': True})
+        return ({'error': False, 'isProfileUnfollowed': True, 'updatedProfile': {'id': parentUserData.id, 'name': parentUserData.name, 'location': parentUserData.location, 'userTag': parentUserData.userTag, 'age': parentUserData.age, 'email': parentUserData.email, 'password': parentUserData.password, 'mobile': parentUserData.mobile, 
+                    'tweetCount': parentUserData.tweetCount, 'followingCount': parentUserData.followingCount, 'followersCount': parentUserData.followersCount, 'joined': str(parentUserData.joined), 'isFollowing': 0, 'dob': str(parentUserData.dob), 'description': parentUserData.description, 'profileImgUrl': parentUserData.profileImgUrl, 'posterImgUrl': parentUserData.posterImgUrl}})
     except Exception as err:
         print(err)
         return ({'error': True, 'errormsg': str(err), 'isProfileUnfollowed': False, 'sampleFormat': {'email': 'testmail', 'parentId': 2}})
