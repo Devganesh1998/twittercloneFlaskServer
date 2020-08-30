@@ -43,13 +43,13 @@ def getAllTweet(data):
         off = 20 * (int(page) - 1)
 
         followerData = User.query.filter(User.email == data['email']).first()
-        sqlQuery = "SELECT * from tweets WHERE tweets.userId = ANY (SELECT parentId from followers WHERE follower = :followerId) OR tweets.userId = :followerId ORDER BY tweets.createdAt DESC LIMIT :offset, 20"
+        sqlQuery = "SELECT t.id, t.title, t.description, t.likes, t.userId, t.createdAt, u.profileImgUrl, u.followersCount, u.followingCount, u.userTag from tweets AS t JOIN users AS u ON t.userId = u.id WHERE t.userId = ANY (SELECT parentId from followers WHERE follower = :followerId) OR t.userId = :followerId ORDER BY t.createdAt DESC LIMIT :offset, 20"
         arg = ({"followerId": followerData.id, 'offset': off})
         tweets = db.session.execute(sqlQuery, arg)
         print(tweets)
         temp = []
         for b in tweets:
-            temp.append({"id": b.id, "title": b.title, "likes": b.likes, "createdAt": str(
+            temp.append({"id": b.id, "userTag": b.userTag, "followingCount": b.followingCount, "followersCount": b.followersCount, "profileImgUrl": b.profileImgUrl, "title": b.title, "likes": b.likes, "createdAt": str(
                 b.createdAt), "description": b.description, "userId": b.userId})
         return ({'error': False, 'isTweetFetched': True, 'tweets': temp})
     except Exception as err:

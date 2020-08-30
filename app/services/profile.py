@@ -15,7 +15,7 @@ def getUserTweets(userEmail):
         print(result)
         temp = []
         for b in result:
-            temp.append({"title": b.title, "description": b.description, 'email': b.email, "userId": b.userId, 'likes': b.likes, 'createdAt': str(b.createdAt)})
+            temp.append({"title": b.title, "description": b.description, 'userTag': b.userTag,'email': b.email, "userId": b.userId, 'likes': b.likes, 'profileImgUrl': b.profileImgUrl, 'followingCount': b.followingCount, 'followersCount': b.followersCount, 'createdAt': str(b.createdAt)})
         return ({'error': False, 'isTweetFetched': True, 'tweets': temp})
     except Exception as err:
         print(err)
