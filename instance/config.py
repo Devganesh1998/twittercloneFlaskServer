@@ -1,1 +1,3 @@
-SQLALCHEMY_DATABASE_URI = 'mysql://deva:Password@1@localhost/twitterclone'
+from instance.credentials import awspass, awsendpoint, dbname
+
+SQLALCHEMY_DATABASE_URI = 'mysql://root:'+ awspass +'@' + awsendpoint +'/' + dbname

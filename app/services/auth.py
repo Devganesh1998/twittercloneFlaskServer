@@ -5,13 +5,8 @@ import jwt
 import datetime
 from flask import make_response, request
 import traceback 
-import redis
 
-# from BackEnd.twittercloneFlaskServer.redisInstance import *
-
-
-pool = redis.ConnectionPool(host='localhost', port=6379)
-redisIns = redis.Redis(connection_pool=pool)
+from redisInstance.redis import redisIns
 
 authKey = 'secret'
 

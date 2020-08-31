@@ -1,2 +1,4 @@
 .env
 flaskenv
+
+credentials.py

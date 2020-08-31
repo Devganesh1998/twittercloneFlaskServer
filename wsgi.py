@@ -1,7 +1,7 @@
 from app import create_app
 from flask_cors import CORS
 
-config_name = 'development'
+config_name = 'produciton'
 app = create_app(config_name)
 CORS(app, supports_credentials=True)
 
