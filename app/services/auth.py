@@ -45,7 +45,8 @@ def register_user(data):
         signedEmail = jwt.encode({'email': data['email']}, authKey, 'HS256').decode('utf-8')
         resp = make_response({'error': False, 'isRegisterSuccess': True, 'message': 'Registered Successfully',
                               'user': {'username': data['userTag'], 'email': data['email']}})
-        resp.set_cookie('signedEmail', str(signedEmail), max_age=expirationTime * 1000)
+        resp.headers.add('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept')
+        resp.set_cookie('signedEmail', str(signedEmail), max_age=expirationTime, secure=True, httponly=True, samesite='None')
         redisIns.setex(str(signedEmail), expirationTime, str(auth_token))
         return resp
     except Exception as err:
@@ -75,7 +76,8 @@ def login_user(credentials):
             signedEmail = jwt.encode({'email': email}, authKey, 'HS256').decode('utf-8')
             resp = make_response({'error': False, 'message': 'Login Successful',
                                   'isLoginSuccess': True, 'user': {'username': username, 'email': email}})
-            resp.set_cookie('signedEmail', str(signedEmail), max_age=expirationTime * 1000)
+            resp.headers.add('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept')
+            resp.set_cookie('signedEmail', str(signedEmail), max_age=expirationTime, secure=True, httponly=True, samesite='None')
             redisIns.setex(str(signedEmail), expirationTime, str(auth_token))
             return resp
         else:
@@ -90,7 +92,7 @@ def logout_user():
         signedEmail = request.cookies.get('signedEmail')
         redisIns.delete(signedEmail)
         resp = make_response({'isLogoutSuccess': True})
-        resp.set_cookie('signedEmail', '', max_age=0)
+        resp.set_cookie('signedEmail', '', max_age=0, secure=True, httponly=True, samesite='None')
         return resp
     except Exception as err:
         print(err)
